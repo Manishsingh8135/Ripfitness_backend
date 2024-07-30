@@ -1,20 +1,29 @@
 // src/app.ts
-import express from 'express';
 import dotenv from 'dotenv';
+dotenv.config();
+
+import express, {Express, Request, Response } from 'express';
+
 import cors from 'cors';
 import helmet from 'helmet';
 import mongoose from 'mongoose';
 import { errorHandler } from './middleware/errorHandler';
 import routes from './routes';
+import path from 'path'
 
-dotenv.config();
 
-const app = express();
+const app:Express = express();
 
 // Middleware
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
+
+
+// Health check route
+app.get('/health', (req: Request, res: Response) => {
+  res.status(200).json({ status: 'OK', message: 'Server is running' });
+});
 
 // Routes
 app.use('/api', routes);

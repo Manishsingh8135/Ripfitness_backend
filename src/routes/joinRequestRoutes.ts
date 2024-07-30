@@ -1,9 +1,15 @@
-import { Router } from 'express';
-import { createJoinRequest, getAllJoinRequests } from '../controllers/joinRequestController';
+// src/routes/joinRequestRoutes.ts
 
-const router = Router();
+import { Router } from 'express';
+import { checkJoinStatus, createJoinRequest, getJoinRequests, updateJoinRequestStatus } from '../controllers/joinRequestController';
+import { auth } from '../middleware/auth';
+
+// Explicitly type the router
+const router: Router = Router();
 
 router.post('/', createJoinRequest);
-router.get('/', getAllJoinRequests);
+router.get('/', getJoinRequests);
+router.post('/:email', checkJoinStatus)
+router.patch('/:id/status', updateJoinRequestStatus);
 
 export default router;

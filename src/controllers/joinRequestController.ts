@@ -1,11 +1,31 @@
 import { Request, Response } from 'express';
+import { joinRequestService } from '../services/joinRequestService';
+import {asyncHandler} from '../utils/asyncHandler'
 
-export const createJoinRequest = (req: Request, res: Response) => {
-  // Implement join request creation logic
-  res.status(201).json({ message: 'Join request created successfully' });
-};
 
-export const getAllJoinRequests = (req: Request, res: Response) => {
-  // Implement fetching all join requests logic
-  res.status(200).json({ message: 'Fetched all join requests' });
-};
+export const createJoinRequest = asyncHandler(async(req:Request, res: Response) => {
+  const joinRequest = await joinRequestService.createJoinRequest(req.body)
+  res.status(201).json(joinRequest)
+})
+
+export const getJoinRequests = asyncHandler(async (req: Request, res: Response) => {
+  const joinRequests = await joinRequestService.getJoinRequests();
+  res.status(200).json(joinRequests)
+})
+
+export const checkJoinStatus = asyncHandler(async (req: Request, res: Response) => {
+    const {email} = req.params;
+    const joinStatus = await joinRequestService.checkJoinStatus(email);
+    res.status(200).json(joinStatus?.status)
+  
+})
+
+export const updateJoinRequestStatus = asyncHandler(async (req: Request , res: Response) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  const updatedJoinRequest = await joinRequestService.updateJoinRequestStatus(id, status);
+  if (!updatedJoinRequest) {
+    return res.status(404).json({ message: "Join request not found" })
+  }
+  res.status(200).json(updatedJoinRequest)
+})

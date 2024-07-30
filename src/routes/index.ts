@@ -4,7 +4,7 @@ import joinRequestRoutes from './joinRequestRoutes';
 import userRoutes from './userRoutes';
 import adminRoutes from './adminRoutes';
 
-const router = Router();
+const router:Router = Router();
 
 router.use('/auth', authRoutes);
 router.use('/join-requests', joinRequestRoutes);
