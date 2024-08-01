@@ -3,8 +3,10 @@ import { joinRequestService } from '../services/joinRequestService';
 import {asyncHandler} from '../utils/asyncHandler'
 
 
+
 export const createJoinRequest = asyncHandler(async(req:Request, res: Response) => {
-  const joinRequest = await joinRequestService.createJoinRequest(req.body)
+  const data = req.body
+  const joinRequest = await joinRequestService.createJoinRequest(data)
   res.status(201).json(joinRequest)
 })
 
