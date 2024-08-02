@@ -1,9 +1,14 @@
 // src/middleware/auth.ts
 
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { IUser } from '@/models/User'; // Adjust the path as necessary
 
-export const auth = (req: Request, res: Response, next: NextFunction) => {
+export interface AuthenticatedRequest extends Request {
+  user?: JwtPayload & IUser; // Adjust as per your JWT payload structure
+}
+
+export const auth = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   const token = req.headers['authorization']?.split(' ')[1];
 
   if (!token) {
@@ -17,8 +22,8 @@ export const auth = (req: Request, res: Response, next: NextFunction) => {
   }
 
   try {
-    const decoded = jwt.verify(token, secret);
-    (req as any).user = decoded;
+    const decoded = jwt.verify(token, secret) as JwtPayload & IUser;
+    req.user = decoded;
     next();
   } catch (error) {
     return res.status(403).json({ message: 'Invalid or expired token' });
