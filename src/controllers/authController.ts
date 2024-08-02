@@ -7,7 +7,8 @@ import { User } from '../models/User'; // Assuming you have a User model
 import { validateRegistration, validateLogin } from '../validations/authValidation'; // We'll create these
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const JWT_EXPIRES_IN = '1d';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
+
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -38,6 +39,31 @@ export const register = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    const { error } = validateLogin(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message })
+
+    const { email, password } = req.body;
+
+    let user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: 'User not found' });
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "password changed successfully" })
+
+  } catch (error) {
+    console.error('Error changing password:', error);
+    res.status(500).json({ message: 'Internal server error' });
+
+  }
+}
 
 export const login = async (req: Request, res: Response) => {
   try {

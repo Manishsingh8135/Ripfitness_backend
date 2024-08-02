@@ -1,25 +1,11 @@
 // src/services/emailService.ts
 
 import nodemailer from 'nodemailer';
-// import dotenv from 'dotenv';
-
-// dotenv.config();
 
 export class EmailService {
   private transporter: nodemailer.Transporter;
 
   constructor() {
-    console.log('Initializing EmailService...');
-    console.log('Working variable example:', process.env.PORT);
-    console.log('MongoDB URI:', process.env.MONGODB_URI);
-    console.log('Email Configuration:', {
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      secure: process.env.EMAIL_SECURE,
-      user: process.env.EMAIL_USER,
-      fromName: process.env.EMAIL_FROM_NAME,
-      fromAddress: process.env.EMAIL_FROM_ADDRESS
-    });
     if (!process.env.EMAIL_HOST) {
       console.error('EMAIL_HOST is undefined. Check your .env file and environment setup.');
       // Optionally, throw an error here if email configuration is critical
@@ -47,7 +33,7 @@ export class EmailService {
     });
   }
 
-  async sendWelcomeEmail(to: string, name: string): Promise<void> {
+  async sendWelcomeEmail(to: string, name: string, tempPassword: string): Promise<void> {
     console.log(`Attempting to send welcome email to: ${to}`);
     try {
       const info = await this.transporter.sendMail({
@@ -58,7 +44,10 @@ export class EmailService {
         html: `
           <h1>Welcome to R1P FITNESS GYM!</h1>
           <p>Hello ${name},</p>
-          <p>We're excited to have you as a member. Here's what you can expect:</p>
+          <p>We're excited to have you as a member. Here's your temporary password to log in:</p>
+          <p><strong>${tempPassword}</strong></p>
+          <p>Please change your password after logging in to ensure the security of your account.</p>
+          <p>Best regards,<br>The R1P FITNESS GYM Team</p>
           <ul>
             <li>Access to state-of-the-art equipment</li>
             <li>Professional trainers to guide you</li>
@@ -77,7 +66,5 @@ export class EmailService {
     }
   }
 }
-console.log('EmailService module loaded at:', new Date().toISOString());
-console.log('MONGODB_URI in app.ts (before import EMAIL SERVICE PAGE):', process.env.EMAIL_HOST, process.env.EMAIL_PASS);
 
 export const emailService = new EmailService();
